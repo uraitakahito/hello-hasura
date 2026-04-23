@@ -1,20 +1,12 @@
 # hello-hasura
 
 Hasura + PostgreSQL で最小のブログを動かす「Hello World」テンプレートです 🚀
-Hasura が自動生成する GraphQL API・リレーション解決・ロールベース権限を最短で体験することを目的としています。
-
-## 🎯 このプロジェクトで学べること
-
-- PostgreSQL にテーブルを作るだけで GraphQL API が自動生成される感覚
-- 1本のクエリで「ユーザー → 投稿 → コメント → コメント投稿者」まで取得できるネスト取得
-- `anonymous` / `user` の2ロールによる権限制御
-- Hasura の migrations / metadata をファイルで管理するワークフロー
 
 ## 🧱 構成
 
 ```
-├── docker-compose.yml           # Hasura + PostgreSQL
-├── .env.example                 # 環境変数サンプル（コピーして .env を作る）
+├── docker-compose.yml
+├── .env.example
 └── hasura/
     ├── config.yaml              # Hasura CLI 設定（ローカル開発で使用）
     ├── migrations/              # DDL とシードデータ（起動時に自動適用）
@@ -39,11 +31,6 @@ users 1 ─── N posts 1 ─── N comments
            ↑                  │
            └──────────────────┘ (comments.user_id = users.id)
 ```
-
-## 📋 前提
-
-- Docker Desktop（あるいは Docker Engine + Docker Compose v2）
-- `curl` と `jq` があると curl の動作確認が楽です（任意）
 
 ## ⚡ 起動
 
