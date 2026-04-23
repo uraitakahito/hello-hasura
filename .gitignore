@@ -1,0 +1,12 @@
+.env
+.DS_Store
+
+# Hasura CLI
+hasura/.hasura-graphql/
+
+# Editor
+.idea/
+.vscode/
+
+# OS
+Thumbs.db
