@@ -46,6 +46,7 @@ services:
       HASURA_GRAPHQL_DEV_MODE: "true"
       HASURA_GRAPHQL_ADMIN_SECRET: ${HASURA_GRAPHQL_ADMIN_SECRET}
       HASURA_GRAPHQL_UNAUTHORIZED_ROLE: anonymous
+      # query-logは本番非推奨。GraphQLの変数には個人情報や機密データが入り得ます。
       HASURA_GRAPHQL_ENABLED_LOG_TYPES: startup,http-log,webhook-log,websocket-log,query-log
 
 volumes:
