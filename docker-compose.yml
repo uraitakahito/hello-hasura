@@ -23,23 +23,30 @@ services:
     ports:
       - "8080:8080"
     volumes:
+      #
       # /hasura-metadata と /hasura-migrations は cli-migrations-v3 イメージの規約パスで、
       # 起動時にこの配下のメタデータ/マイグレーションが自動適用される。
       # 公式ドキュメント: https://hasura.io/docs/2.0/migrations-metadata-seeds/auto-apply-migrations/
+      #
+      # hdb_catalogに書き込む
       - ./hasura/metadata:/hasura-metadata
+      # appに書き込む
       - ./hasura/migrations:/hasura-migrations
     environment:
       HASURA_GRAPHQL_DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD}@postgres:5432/postgres
       HASURA_GRAPHQL_METADATA_DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD}@postgres:5432/postgres
       HASURA_GRAPHQL_ENABLE_CONSOLE: "true"
+      #
       # ⚠️ 本番では必ず false にすること。
       # true の場合、エラーレスポンスの extensions.internal に発行 SQL や PostgreSQL の
       # 詳細エラーメッセージが載り、非 admin ロール（anonymous/user）にも見える（情報漏洩リスク）。
       # admin ロールはこのフラグと無関係に internal を見られるため、BFF（Backend For Frontend）が admin で叩く構成では
       # true にするメリットはほぼない。運用中のデバッグは query-log / http-log をログ基盤に流す方が筋が良い。
+      #
       HASURA_GRAPHQL_DEV_MODE: "true"
       HASURA_GRAPHQL_ADMIN_SECRET: ${HASURA_GRAPHQL_ADMIN_SECRET}
       HASURA_GRAPHQL_UNAUTHORIZED_ROLE: anonymous
+      # query-logは本番非推奨。GraphQLの変数には個人情報や機密データが入り得ます。
       HASURA_GRAPHQL_ENABLED_LOG_TYPES: startup,http-log,webhook-log,websocket-log,query-log
 
 volumes:

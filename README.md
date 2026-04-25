@@ -101,7 +101,7 @@ query {
 }
 ```
 
-を実行すると **2件しか返らない** はずです。`cccccccc-...` の投稿は `published=false`（下書き）なので、デフォルトロール `anonymous` からは見えません。
+を実行すると **2件しか返らない** はずです。`cccccccc-...` の投稿は `published=false`なので、デフォルトロール `anonymous` からは見えません。
 
 次に、admin secret を有効に戻し、さらに以下の2行を追加します。
 
@@ -112,7 +112,7 @@ query {
 
 これは「私は Alice として振る舞いたい」という指定です。この状態でもう一度 `posts { title }` を実行すると、**Alice の下書きも含めた3件** が返ります。`X-Hasura-User-Id` を Bob（`22222222-...`）に変えると、Alice の下書きが消えて2件に戻ります。
 
-これが `anonymous` / `user` ロールによる行レベル権限の効果です。設定は `metadata/databases/blog/tables/app_posts.yaml` の `select_permissions` セクションで行われています。
+設定は `metadata/databases/blog/tables/app_posts.yaml` の `select_permissions` セクションで行われています。
 
 ### ステップ 5: Mutation で投稿を追加してみる
 
@@ -146,6 +146,10 @@ mutation {
 ```
 
 返り値が `null` になります（Bob の投稿は Alice には filter に弾かれて更新対象ゼロ件）。
+
+### 実際に確認する方法
+
+`insert_posts_one` のような mutation 名は GraphQL の予約語ではなく、Hasura がテーブル定義から自動生成する **field** です。Hasura Console の **API** タブ右側の `< Docs` ボタンを開くと `mutation_root` の field 一覧がそのまま確認できます。**Data** タブで `Untrack` を押すと、対応する field がスキーマから消えて呼び出せなくなる挙動も体験できます。
 
 ### ステップ 6（発展）: スキーマを変えてみる
 
