@@ -89,8 +89,6 @@ query {
 }
 ```
 
-**これが Hasura の核心です**。
-
 - REST API なら `GET /users` → 各 user の `GET /users/:id/posts` → 各 post の `GET /posts/:id/comments` → 各 comment の `GET /users/:id` と、4階層で N+1 クエリが発生します。
 - Hasura では JOIN をメタデータとして定義しておけば、上のクエリが裏側で効率的な SQL に変換されて1往復で返ります。
 
