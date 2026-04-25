@@ -89,11 +89,6 @@ query {
 }
 ```
 
-- REST API なら `GET /users` → 各 user の `GET /users/:id/posts` → 各 post の `GET /posts/:id/comments` → 各 comment の `GET /users/:id` と、4階層で N+1 クエリが発生します。
-- Hasura では JOIN をメタデータとして定義しておけば、上のクエリが裏側で効率的な SQL に変換されて1往復で返ります。
-
-`metadata/databases/blog/tables/public_posts.yaml` の `object_relationships` / `array_relationships` セクションを覗いてみると、`author` や `comments` というリレーション名がどう定義されているかが分かります。
-
 ### ステップ 4: ロールを切り替えて権限を体験する
 
 GraphiQL 右上の `REQUEST HEADERS` で `x-hasura-admin-secret` の行の `☑` を**外します**（admin secret を使わない状態）。
