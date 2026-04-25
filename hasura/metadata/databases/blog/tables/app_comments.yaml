@@ -1,6 +1,8 @@
 table:
-  schema: public
+  schema: app
   name: comments
+configuration:
+  custom_name: comments
 object_relationships:
   - name: author
     using:
