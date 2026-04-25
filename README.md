@@ -1,31 +1,23 @@
 # hello-hasura
 
 Hasura + PostgreSQL で最小のブログを動かす「Hello World」テンプレートです 🚀
-Hasura が自動生成する GraphQL API・リレーション解決・ロールベース権限を最短で体験することを目的としています。
-
-## 🎯 このプロジェクトで学べること
-
-- PostgreSQL にテーブルを作るだけで GraphQL API が自動生成される感覚
-- 1本のクエリで「ユーザー → 投稿 → コメント → コメント投稿者」まで取得できるネスト取得
-- `anonymous` / `user` の2ロールによる権限制御
-- Hasura の migrations / metadata をファイルで管理するワークフロー
 
 ## 🧱 構成
 
 ```
-├── docker-compose.yml           # Hasura + PostgreSQL
-├── .env.example                 # 環境変数サンプル（コピーして .env を作る）
+├── docker-compose.yml
+├── .env.example
 └── hasura/
     ├── config.yaml              # Hasura CLI 設定（ローカル開発で使用）
     ├── migrations/              # DDL とシードデータ（起動時に自動適用）
-    │   └── default/1700000000000_init/
+    │   └── blog/1776951599000_init/
     │       ├── up.sql
     │       └── down.sql
     └── metadata/                # テーブル追跡・リレーション・権限の定義
         ├── version.yaml
         └── databases/
             ├── databases.yaml
-            └── default/tables/
+            └── blog/tables/
                 ├── tables.yaml
                 ├── public_users.yaml
                 ├── public_posts.yaml
@@ -40,11 +32,6 @@ users 1 ─── N posts 1 ─── N comments
            └──────────────────┘ (comments.user_id = users.id)
 ```
 
-## 📋 前提
-
-- Docker Desktop（あるいは Docker Engine + Docker Compose v2）
-- `curl` と `jq` があると curl の動作確認が楽です（任意）
-
 ## ⚡ 起動
 
 ```bash
@@ -52,14 +39,14 @@ cp .env.example .env
 docker compose up -d
 ```
 
-起動には初回のみイメージの pull で数分かかります。起動後に以下を確認してください。
+起動後に以下を確認してください。
 
 ```bash
 curl http://localhost:8080/healthz
 # => OK
 ```
 
-ブラウザで **http://localhost:8080/console** を開き、`.env` の `HASURA_GRAPHQL_ADMIN_SECRET`（デフォルト `myadminsecretkey`）を入力すると Hasura Console が開きます。
+ブラウザで **http://localhost:8080/console** を開き、`.env` の `HASURA_GRAPHQL_ADMIN_SECRET` を入力すると Hasura Console が開きます。
 
 ---
 
@@ -67,7 +54,7 @@ curl http://localhost:8080/healthz
 
 ### ステップ 1: Console でテーブルを確認する
 
-Console の上部メニューから **Data** → 左サイドの `default` → `public` を開くと、3つのテーブル `users` / `posts` / `comments` がすでに tracked な状態で並んでいます。それぞれ開くと、シードデータ（ユーザー2名・投稿3件・コメント4件）が入っているのが確認できます。
+Console の上部メニューから **Data** → 左サイドの `blog` → `public` を開くと、3つのテーブル `users` / `posts` / `comments` がすでに tracked な状態で並んでいます。
 
 ### ステップ 2: 最初の GraphQL クエリ
 
@@ -83,9 +70,7 @@ query {
 }
 ```
 
-**ポイント**: `users` テーブルを作っただけで、`query { users { ... } }` という GraphQL クエリが自動で使えるようになっています。SELECT 文を書かなくていい、という感覚をまず味わってください 🎉
-
-### ステップ 3: リレーションを活用する（Hasura の山場）
+### ステップ 3: リレーションを活用する
 
 次に、投稿とそのコメント、コメントの投稿者まで一気に取得します。
 
@@ -103,13 +88,6 @@ query {
   }
 }
 ```
-
-**これが Hasura の核心です**。
-
-- REST API なら `GET /users` → 各 user の `GET /users/:id/posts` → 各 post の `GET /posts/:id/comments` → 各 comment の `GET /users/:id` と、4階層で N+1 クエリが発生します。
-- Hasura では JOIN をメタデータとして定義しておけば、上のクエリが裏側で効率的な SQL に変換されて1往復で返ります。
-
-`metadata/databases/default/tables/public_posts.yaml` の `object_relationships` / `array_relationships` セクションを覗いてみると、`author` や `comments` というリレーション名がどう定義されているかが分かります。
 
 ### ステップ 4: ロールを切り替えて権限を体験する
 
@@ -134,7 +112,7 @@ query {
 
 これは「私は Alice として振る舞いたい」という指定です。この状態でもう一度 `posts { title }` を実行すると、**Alice の下書きも含めた3件** が返ります。`X-Hasura-User-Id` を Bob（`22222222-...`）に変えると、Alice の下書きが消えて2件に戻ります。
 
-これが `anonymous` / `user` ロールによる行レベル権限の効果です。設定は `metadata/databases/default/tables/public_posts.yaml` の `select_permissions` セクションで行われています。
+これが `anonymous` / `user` ロールによる行レベル権限の効果です。設定は `metadata/databases/blog/tables/public_posts.yaml` の `select_permissions` セクションで行われています。
 
 ### ステップ 5: Mutation で投稿を追加してみる
 
