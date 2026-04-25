@@ -101,7 +101,7 @@ query {
 }
 ```
 
-を実行すると **2件しか返らない** はずです。`cccccccc-...` の投稿は `published=false`（下書き）なので、デフォルトロール `anonymous` からは見えません。
+を実行すると **2件しか返らない** はずです。`cccccccc-...` の投稿は `published=false`なので、デフォルトロール `anonymous` からは見えません。
 
 次に、admin secret を有効に戻し、さらに以下の2行を追加します。
 
