@@ -54,7 +54,7 @@ curl http://localhost:8080/healthz
 
 ### ステップ 1: Console でテーブルを確認する
 
-Console の上部メニューから **Data** → 左サイドの `blog` → `public` を開くと、3つのテーブル `users` / `posts` / `comments` がすでに tracked な状態で並んでいます。
+Console の上部メニューから **Data** → 左サイドの `blog` → `public` を開くと、[3つのテーブル](./hasura/metadata/databases/blog/tables/tables.yaml)がすでに tracked な状態で並んでいます。
 
 ### ステップ 2: 最初の GraphQL クエリ
 
