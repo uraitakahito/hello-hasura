@@ -23,6 +23,9 @@ services:
     ports:
       - "8080:8080"
     volumes:
+      # /hasura-metadata と /hasura-migrations は cli-migrations-v3 イメージの規約パスで、
+      # 起動時にこの配下のメタデータ/マイグレーションが自動適用される。
+      # 公式ドキュメント: https://hasura.io/docs/2.0/migrations-metadata-seeds/auto-apply-migrations/
       - ./hasura/metadata:/hasura-metadata
       - ./hasura/migrations:/hasura-migrations
     environment:
