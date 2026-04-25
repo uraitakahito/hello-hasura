@@ -132,6 +132,8 @@ mutation {
 }
 ```
 
+`insert_posts_one` のような mutation 名は GraphQL の予約語ではなく、Hasura がテーブル定義から自動生成する **field** です。Hasura Console の **API** タブ右側の `< Docs` ボタンを開くと `mutation_root` の field 一覧がそのまま確認できます。**Data** タブで `Untrack` を押すと、対応する field がスキーマから消えて呼び出せなくなる挙動も体験できます。
+
 `user_id` を指定していないのに返り値には Alice の ID が入っているはずです。これは `app_posts.yaml` の `insert_permissions.set` で `user_id: x-hasura-user-id` を強制しているためです。**自分の ID 以外の user_id で投稿することはできません**。
 
 他人の投稿を書き換えようとすると以下のようにエラーになります。
@@ -146,10 +148,6 @@ mutation {
 ```
 
 返り値が `null` になります（Bob の投稿は Alice には filter に弾かれて更新対象ゼロ件）。
-
-### 実際に確認する方法
-
-`insert_posts_one` のような mutation 名は GraphQL の予約語ではなく、Hasura がテーブル定義から自動生成する **field** です。Hasura Console の **API** タブ右側の `< Docs` ボタンを開くと `mutation_root` の field 一覧がそのまま確認できます。**Data** タブで `Untrack` を押すと、対応する field がスキーマから消えて呼び出せなくなる挙動も体験できます。
 
 ### ステップ 6（発展）: スキーマを変えてみる
 
