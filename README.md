@@ -147,6 +147,10 @@ mutation {
 
 返り値が `null` になります（Bob の投稿は Alice には filter に弾かれて更新対象ゼロ件）。
 
+### 実際に確認する方法
+
+`insert_posts_one` のような mutation 名は GraphQL の予約語ではなく、Hasura がテーブル定義から自動生成する **field** です。Hasura Console の **API** タブ右側の `< Docs` ボタンを開くと `mutation_root` の field 一覧がそのまま確認できます。**Data** タブで `Untrack` を押すと、対応する field がスキーマから消えて呼び出せなくなる挙動も体験できます。
+
 ### ステップ 6（発展）: スキーマを変えてみる
 
 Hasura Console から新しいカラムを追加したり、テーブルを作ったりもできます。ただし、その変更を **ファイルとして永続化** するには Hasura CLI（`hasura`）を別途インストールして `hasura console` 経由で開く必要があります。詳しくは [Hasura のドキュメント](https://hasura.io/docs/2.0/hasura-cli/overview/) を参照してください。
