@@ -112,7 +112,7 @@ query {
 
 これは「私は Alice として振る舞いたい」という指定です。この状態でもう一度 `posts { title }` を実行すると、**Alice の下書きも含めた3件** が返ります。`X-Hasura-User-Id` を Bob（`22222222-...`）に変えると、Alice の下書きが消えて2件に戻ります。
 
-これが `anonymous` / `user` ロールによる行レベル権限の効果です。設定は `metadata/databases/blog/tables/app_posts.yaml` の `select_permissions` セクションで行われています。
+設定は `metadata/databases/blog/tables/app_posts.yaml` の `select_permissions` セクションで行われています。
 
 ### ステップ 5: Mutation で投稿を追加してみる
 
