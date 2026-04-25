@@ -39,7 +39,7 @@ cp .env.example .env
 docker compose up -d
 ```
 
-起動には初回のみイメージの pull で数分かかります。起動後に以下を確認してください。
+起動後に以下を確認してください。
 
 ```bash
 curl http://localhost:8080/healthz
