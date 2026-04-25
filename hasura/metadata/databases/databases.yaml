@@ -1,4 +1,4 @@
-- name: default
+- name: blog
   kind: postgres
   configuration:
     connection_info:
@@ -6,4 +6,4 @@
         from_env: HASURA_GRAPHQL_DATABASE_URL
       isolation_level: read-committed
       use_prepared_statements: true
-  tables: "!include default/tables/tables.yaml"
+  tables: "!include blog/tables/tables.yaml"
