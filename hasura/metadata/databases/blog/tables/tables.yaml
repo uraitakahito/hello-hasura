@@ -1,3 +1,3 @@
-- "!include public_users.yaml"
-- "!include public_posts.yaml"
-- "!include public_comments.yaml"
+- "!include app_users.yaml"
+- "!include app_posts.yaml"
+- "!include app_comments.yaml"
