@@ -46,7 +46,7 @@ curl http://localhost:8080/healthz
 # => OK
 ```
 
-ブラウザで **http://localhost:8080/console** を開き、`.env` の `HASURA_GRAPHQL_ADMIN_SECRET`（デフォルト `myadminsecretkey`）を入力すると Hasura Console が開きます。
+ブラウザで **http://localhost:8080/console** を開き、`.env` の `HASURA_GRAPHQL_ADMIN_SECRET` を入力すると Hasura Console が開きます。
 
 ---
 
