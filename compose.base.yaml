@@ -1,0 +1,44 @@
+# compose.base.yaml — dev/prod 共通の最小定義
+#
+# このファイル単独では起動できない。必ず compose.dev.yaml か compose.prod.yaml を
+# `-f` で重ねて使う。
+#
+#   docker compose -f compose.base.yaml -f compose.dev.yaml  up -d
+#   docker compose -f compose.base.yaml -f compose.prod.yaml up -d
+#
+# 注意:
+#   - graphql-engine.image は base には書かない。dev/prod それぞれが別イメージを
+#     使うため、ここで宣言してしまうと意図が薄れる。
+#   - postgres.ports は base に含めない。dev のみホストへ公開する。
+#   - db_data ボリュームはプロジェクト名で分離される (compose.dev/prod の `name:`
+#     により実体は hello-hasura-dev_db_data / hello-hasura-prod_db_data となる)。
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  graphql-engine:
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      HASURA_GRAPHQL_DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD}@postgres:5432/postgres
+      HASURA_GRAPHQL_METADATA_DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD}@postgres:5432/postgres
+      HASURA_GRAPHQL_ADMIN_SECRET: ${HASURA_GRAPHQL_ADMIN_SECRET}
+      HASURA_GRAPHQL_UNAUTHORIZED_ROLE: anonymous
+
+volumes:
+  db_data:

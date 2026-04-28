@@ -1,0 +1,82 @@
+# compose.prod.yaml — 本番想定の構成
+#
+# 起動:
+#   docker compose -f compose.base.yaml -f compose.prod.yaml up -d
+#
+# マイグレーション/メタデータ適用（明示的に流す。通常起動には含まれない）:
+#   docker compose -f compose.base.yaml -f compose.prod.yaml \
+#     --profile migrate run --rm migrator
+#
+# 特徴:
+#   - 素の graphql-engine イメージ（cli-migrations なし）。再起動時に metadata が
+#     勝手に巻き戻ることはない。
+#   - bind mount を付けないため /hasura-metadata /hasura-migrations は見えない。
+#   - Console / DEV_MODE / query-log すべて無効（情報漏洩リスクを最小化）。
+#   - migrator サービスは profiles: ["migrate"] で隔離。`--profile migrate` を
+#     付けたときのみ起動する。
+#
+# プロジェクト名は hello-hasura-prod。compose.dev.yaml と分離されているので
+# db_data ボリュームの実体も別。
+
+name: hello-hasura-prod
+
+services:
+  graphql-engine:
+    image: hasura/graphql-engine:v2.48.16
+    environment:
+      HASURA_GRAPHQL_ENABLE_CONSOLE: "false"
+      HASURA_GRAPHQL_DEV_MODE: "false"
+      HASURA_GRAPHQL_ENABLED_LOG_TYPES: startup,http-log,webhook-log,websocket-log
+
+  # one-shot で metadata apply / migrate apply / metadata reload を実行する。
+  # cli-migrations-v3 イメージには hasura-cli が入っているので、それを直接叩く。
+  # 標準 entrypoint は graphql-engine も起動させてしまうため、entrypoint を上書きしている。
+  #
+  # hasura-cli は config.yaml を含む project ディレクトリで実行する必要があるため、
+  # /tmp/hasura-project に metadata/ migrations/ をコピーして config.yaml を生成する
+  # （cli-migrations-v3 の標準 entrypoint と同じ手法）。
+  migrator:
+    image: hasura/graphql-engine:v2.48.16.cli-migrations-v3
+    profiles: ["migrate"]
+    restart: "no"
+    depends_on:
+      graphql-engine:
+        condition: service_started
+    volumes:
+      - ./hasura/metadata:/hasura-metadata:ro
+      - ./hasura/migrations:/hasura-migrations:ro
+    environment:
+      HASURA_GRAPHQL_ADMIN_SECRET: ${HASURA_GRAPHQL_ADMIN_SECRET}
+    entrypoint: ["sh", "-eu", "-c"]
+    command:
+      - |
+        echo "[migrator] waiting for graphql-engine /healthz..."
+        until curl -fsS "http://graphql-engine:8080/healthz" >/dev/null; do
+          sleep 1
+        done
+        echo "[migrator] graphql-engine is ready"
+
+        TMP=/tmp/hasura-project
+        rm -rf "$$TMP"
+        mkdir -p "$$TMP/metadata" "$$TMP/migrations"
+        cp -a /hasura-metadata/.  "$$TMP/metadata/"
+        cp -a /hasura-migrations/. "$$TMP/migrations/"
+        cd "$$TMP"
+        {
+          echo "version: 3"
+          echo "endpoint: http://graphql-engine:8080"
+          echo "admin_secret: $$HASURA_GRAPHQL_ADMIN_SECRET"
+          echo "metadata_directory: metadata"
+          echo "migrations_directory: migrations"
+        } > config.yaml
+
+        echo "[migrator] applying metadata"
+        hasura-cli metadata apply --skip-update-check
+
+        echo "[migrator] applying migrations (--all-databases)"
+        hasura-cli migrate apply --all-databases --skip-update-check
+
+        echo "[migrator] reloading metadata"
+        hasura-cli metadata reload --skip-update-check
+
+        echo "[migrator] done"

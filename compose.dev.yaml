@@ -1,0 +1,35 @@
+# compose.dev.yaml — 開発環境専用の上書き
+#
+# 起動:
+#   docker compose -f compose.base.yaml -f compose.dev.yaml up -d
+#
+# 特徴:
+#   - cli-migrations-v3 イメージ + bind mount で「ファイル編集 → 再起動で反映」が効く
+#   - Console / DEV_MODE / query-log すべて有効（学習・デバッグ向け）
+#   - PostgreSQL を 5432 でホストに公開（ローカル DB クライアントから接続可能）
+#
+# プロジェクト名は hello-hasura-dev で固定。compose.prod.yaml の hello-hasura-prod と
+# 別名のため、db_data ボリュームの実体も別になる（dev/prod のデータが混ざらない）。
+
+name: hello-hasura-dev
+
+services:
+  postgres:
+    ports:
+      - "5432:5432"
+
+  graphql-engine:
+    image: hasura/graphql-engine:v2.48.16.cli-migrations-v3
+    volumes:
+      # /hasura-metadata と /hasura-migrations は cli-migrations-v3 イメージの規約パスで、
+      # 起動時にこの配下のメタデータ/マイグレーションが自動適用される。
+      # https://hasura.io/docs/2.0/migrations-metadata-seeds/auto-apply-migrations/
+      - ./hasura/metadata:/hasura-metadata
+      - ./hasura/migrations:/hasura-migrations
+    environment:
+      HASURA_GRAPHQL_ENABLE_CONSOLE: "true"
+      # ⚠️ DEV_MODE=true は非 admin ロールにも extensions.internal で SQL 等が漏れるため
+      # 本番では絶対に有効化しないこと。dev 用ファイルなので true で問題ない。
+      HASURA_GRAPHQL_DEV_MODE: "true"
+      # query-log は GraphQL 変数（個人情報含む可能性あり）をログに残すため本番非推奨。
+      HASURA_GRAPHQL_ENABLED_LOG_TYPES: startup,http-log,webhook-log,websocket-log,query-log
