@@ -5,13 +5,6 @@
 #
 #   docker compose -f compose.base.yaml -f compose.dev.yaml  up -d
 #   docker compose -f compose.base.yaml -f compose.prod.yaml up -d
-#
-# 注意:
-#   - graphql-engine.image は base には書かない。dev/prod それぞれが別イメージを
-#     使うため、ここで宣言してしまうと意図が薄れる。
-#   - postgres.ports は base に含めない。dev のみホストへ公開する。
-#   - db_data ボリュームはプロジェクト名で分離される (compose.dev/prod の `name:`
-#     により実体は hello-hasura-dev_db_data / hello-hasura-prod_db_data となる)。
 
 services:
   postgres:
