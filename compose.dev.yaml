@@ -2,14 +2,6 @@
 #
 # 起動:
 #   docker compose -f compose.base.yaml -f compose.dev.yaml up -d
-#
-# 特徴:
-#   - cli-migrations-v3 イメージ + bind mount で「ファイル編集 → 再起動で反映」が効く
-#   - Console / DEV_MODE / query-log すべて有効（学習・デバッグ向け）
-#   - PostgreSQL を 5432 でホストに公開（ローカル DB クライアントから接続可能）
-#
-# プロジェクト名は hello-hasura-dev で固定。compose.prod.yaml の hello-hasura-prod と
-# 別名のため、db_data ボリュームの実体も別になる（dev/prod のデータが混ざらない）。
 
 name: hello-hasura-dev
 

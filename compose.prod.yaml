@@ -6,17 +6,6 @@
 # マイグレーション/メタデータ適用（明示的に流す。通常起動には含まれない）:
 #   docker compose -f compose.base.yaml -f compose.prod.yaml \
 #     --profile migrate run --rm migrator
-#
-# 特徴:
-#   - 素の graphql-engine イメージ（cli-migrations なし）。再起動時に metadata が
-#     勝手に巻き戻ることはない。
-#   - bind mount を付けないため /hasura-metadata /hasura-migrations は見えない。
-#   - Console / DEV_MODE / query-log すべて無効（情報漏洩リスクを最小化）。
-#   - migrator サービスは profiles: ["migrate"] で隔離。`--profile migrate` を
-#     付けたときのみ起動する。
-#
-# プロジェクト名は hello-hasura-prod。compose.dev.yaml と分離されているので
-# db_data ボリュームの実体も別。
 
 name: hello-hasura-prod
 
