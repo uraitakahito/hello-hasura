@@ -36,7 +36,7 @@ users 1 ─── N posts 1 ─── N comments
 
 ## ⚡ 起動
 
-### 開発環境（チュートリアルはこちら）
+### 開発環境
 
 ```bash
 cp .env.example .env
