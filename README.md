@@ -43,10 +43,6 @@ cp .env.example .env
 docker compose -f compose.base.yaml -f compose.dev.yaml up -d
 ```
 
-- `cli-migrations-v3` イメージ + `./hasura/{metadata,migrations}` の bind mount で、ファイルを編集して `down && up -d` するだけで反映されます。
-- Console / DEV_MODE / query-log すべて有効。PostgreSQL も `5432` でホスト公開。
-- プロジェクト名は `hello-hasura-dev`、DB ボリュームは `hello-hasura-dev_db_data`。
-
 起動後に確認:
 
 ```bash
@@ -66,11 +62,6 @@ docker compose -f compose.base.yaml -f compose.prod.yaml up -d
 docker compose -f compose.base.yaml -f compose.prod.yaml \
   --profile migrate run --rm migrator
 ```
-
-- `graphql-engine` は **素の `hasura/graphql-engine:v2.48.16`**（cli-migrations なし）を使うため、コンテナ再起動で metadata が巻き戻ることはありません。
-- bind mount は付かず、Console / DEV_MODE / query-log もすべて `false`。
-- `migrator` サービスは `profiles: ["migrate"]` で隔離されており、通常の `up -d` には含まれません。`--profile migrate run --rm migrator` で one-shot 実行します。
-- プロジェクト名は `hello-hasura-prod`、DB ボリュームは `hello-hasura-prod_db_data` で、dev とは完全に分離されます。
 
 ---
 
